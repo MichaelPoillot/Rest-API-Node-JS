@@ -7,7 +7,6 @@ export function getUsers(req, res) {
       console.error('Error querying database: ' + err.stack);
       return res.status(500).json({ success: false, message: 'Internal server error' });
     }
-    
     res.status(200).json({ success: true, data: results, message: "Success get all users" });
   });
 }
