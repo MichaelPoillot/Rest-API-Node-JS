@@ -22,7 +22,7 @@ export function register (req,res){
       return res.status(400).json({message: 'Password do not match'})
   }
   connection.query('SELECT * FROM users WHERE email = ?',[email],
-  function (err,rows, fields) {
+  async function (err,rows, fields) {
     if (err) {
       console.error('Error querying database: ' + err.stack);
       return res.status(500).json({ success: false, message: 'Internal server error' }); 
@@ -30,16 +30,19 @@ export function register (req,res){
     if (rows.length > 0 ) {
       return res.status(400).json({message: 'email already exist'})
     }
-    connection.query('INSERT INTO users (username,email,password,created_at) VALUES (?,?,?,NOW())',[username,email,password],
+    const salt = await bcrypt.genSalt();
+    const hashPassword = await bcrypt.hash(password, salt);
+    connection.query('INSERT INTO users (username,email,password,created_at) VALUES (?,?,?,NOW())',[username,email,hashPassword],
       function(err, result){
         if (err) {
           console.error('Error querying database: ' + err.stack);
           return res.status(500).json({ success: false, message: 'Internal server error' });
         }
         const id = result.id
-        res.status(201).json({ success: true, data: { id: id, username, email }, message: "User created" });
+        res.status(200).json({ success: true, data: { id: id, username, email }, message: "User created" });
       }
     )
   })
 };
+
 
