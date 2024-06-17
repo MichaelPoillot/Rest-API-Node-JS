@@ -1,11 +1,20 @@
 import express from "express";
 import connection from "./config/database.js";
-import router from "./routes/index.js";
+import userRoutes from "./routes/userRoutes.js";
 import bodyParser from "body-parser";
 import dotenv from "dotenv";
+
+// Load environment variables
 dotenv.config();
 
 const app = express();
+
+app.use(bodyParser.json());
+
+// Routes
+app.use('/users', userRoutes);
+
+// Cek Connection
 connection.connect((error) => {
     if (error) {
       console.error('Error i looo blok a on XAMPP mu mati paling');
@@ -14,9 +23,6 @@ connection.connect((error) => {
     console.log('Connected to database!');
   });
 
-
-app.use(bodyParser.json());
-app.use(router);
-
-
 app.listen(5000, () => console.log("Server running at port 5000"));
+
+
